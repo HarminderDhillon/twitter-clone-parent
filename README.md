@@ -54,15 +54,25 @@ This will start all containers:
 
 ### 4. Access the Application
 
+After starting the application, the ports will be automatically displayed. 
+
+You can also check the ports anytime with:
+```bash
+npm run ports
+```
+
+Standard ports (if available):
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8082/api
 - API Documentation: http://localhost:8082/api/swagger-ui.html
+
+**Note**: If port 3000 is already in use, Docker will automatically use the next available port in the range 3000-3010. The actual port will be displayed when you run `npm start` or `npm run ports`.
 
 ## Available Scripts
 
 The project includes several npm scripts to help with Docker operations:
 
-- `npm start` - Starts all Docker services (docker-compose up -d)
+- `npm start` - Starts all Docker services and displays access URLs
 - `npm run stop` - Stops all Docker services (docker-compose down)
 - `npm run restart` - Restarts all Docker services (docker-compose restart)
 - `npm run logs` - Shows logs from all Docker services
@@ -73,6 +83,7 @@ The project includes several npm scripts to help with Docker operations:
 - `npm run rebuild` - Rebuilds all Docker images from scratch (no cache)
 - `npm run clean` - Stops all services and removes volumes
 - `npm run status` - Shows the status of all Docker containers
+- `npm run ports` - Shows the URLs and ports for all services
 
 ## Docker Setup
 

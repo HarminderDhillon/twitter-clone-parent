@@ -97,7 +97,7 @@ services:
       dockerfile: Dockerfile
     container_name: twitter-clone-frontend
     ports:
-      - "3000:3000"
+      - "3000-3010:3000"
     depends_on:
       - backend
     environment:
