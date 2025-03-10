@@ -115,16 +115,24 @@ services:
       start_period: 20s
 
   app-info:
-    image: busybox:latest
+    image: alpine:latest
     container_name: twitter-clone-info
     depends_on:
       - frontend
       - backend
     command: >
       sh -c "
-        sleep 3 &&
+        apk add --no-cache curl &&
+        sleep 5 &&
+        FRONTEND_PORT=3000 &&
+        for port in $(seq 3000 3010); do
+          if curl -s -o /dev/null -w '' http://localhost:$port; then
+            FRONTEND_PORT=$port
+            break
+          fi
+        done &&
         echo '===== Twitter Clone Application Running =====' &&
-        echo 'Frontend:         http://localhost:'$(nc -z -v -w1 localhost 3000-3010 2>&1 | grep succeeded | head -n1 | sed 's/.*localhost://' | sed 's/ .*//' || echo '3000') &&
+        echo 'Frontend:         http://localhost:'$FRONTEND_PORT &&
         echo 'Backend API:      http://localhost:8082/api' &&
         echo 'API Documentation: http://localhost:8082/api/swagger-ui.html' &&
         echo '=============================================' &&
