@@ -8,42 +8,32 @@ NC='\033[0m' # No Color
 
 echo -e "${GREEN}Setting up Twitter Clone monorepo workspace...${NC}"
 
-# Check Node.js version
-NODE_VERSION=$(node -v)
-echo -e "${YELLOW}Detected Node.js version: ${NODE_VERSION}${NC}"
-echo -e "${YELLOW}Required Node.js version: >=18.0.0${NC}"
-
-# Install root level dependencies
-echo -e "${GREEN}Installing root level dependencies...${NC}"
-npm install
-
-# Install frontend dependencies using workspaces
-echo -e "${GREEN}Installing frontend dependencies...${NC}"
-npm install --workspace=frontend
-
-# Check if Maven is installed
-if command -v mvn &> /dev/null; then
-    echo -e "${GREEN}Maven found. Installing backend dependencies...${NC}"
-    cd backend && ./mvnw dependency:go-offline -B && cd ..
-else
-    echo -e "${YELLOW}Maven not found. Backend dependencies will be installed when you run the application.${NC}"
+# Check Docker is installed
+if ! command -v docker &> /dev/null || ! command -v docker-compose &> /dev/null; then
+    echo -e "${RED}Docker and/or docker-compose not found.${NC}"
+    echo -e "${YELLOW}Please install Docker Desktop or Docker Engine with Compose to continue.${NC}"
+    exit 1
 fi
 
-# Check if Docker is available
-if command -v docker &> /dev/null && command -v docker-compose &> /dev/null; then
-    echo -e "${GREEN}Docker found.${NC}"
-    echo -e "${YELLOW}Do you want to start the Docker services (PostgreSQL, Redis, etc.)? (y/n)${NC}"
-    read -p "" start_docker
-    if [[ "$start_docker" =~ ^[Yy]$ ]]; then
-        echo -e "${GREEN}Starting Docker services...${NC}"
-        docker-compose up -d postgres redis
-    fi
+# Install root level npm dependencies (minimal, just for scripts)
+echo -e "${GREEN}Installing minimal npm dependencies for scripts...${NC}"
+npm install --no-package-lock
+
+echo -e "${GREEN}Docker found. Building Docker images...${NC}"
+read -p "Do you want to build the Docker images now? This may take a few minutes. (y/n): " build_images
+if [[ "$build_images" =~ ^[Yy]$ ]]; then
+    docker-compose build
+    echo -e "${GREEN}Docker images built successfully.${NC}"
 else
-    echo -e "${YELLOW}Docker not found. You will need to have PostgreSQL running locally or in another way.${NC}"
+    echo -e "${YELLOW}Skipping image build. You can build them later with 'npm run build'.${NC}"
 fi
 
 echo -e "${GREEN}Workspace setup complete!${NC}"
 echo -e "${YELLOW}To start the application, run:${NC}"
-echo -e "npm run start"
-echo -e "${YELLOW}To run in Docker, run:${NC}"
-echo -e "npm run docker" 
+echo -e "npm start"
+echo -e "${YELLOW}To view logs, run:${NC}"
+echo -e "npm run logs"
+echo -e "${YELLOW}To check the status of containers, run:${NC}"
+echo -e "npm run status"
+echo -e "${YELLOW}To stop the application, run:${NC}"
+echo -e "npm run stop" 
