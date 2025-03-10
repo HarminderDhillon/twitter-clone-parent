@@ -1,0 +1,80 @@
+# Project-specific
+.DS_Store
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.idea/
+.vscode/
+.cursor/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# Spring Boot
+twitter-clone/target/
+twitter-clone/build/
+twitter-clone/out/
+twitter-clone/.gradle/
+twitter-clone/bin/
+
+# Logs
+twitter-clone/logs/
+twitter-clone/*.log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+twitter-clone-ui/.next/
+twitter-clone-ui/out/
+twitter-clone-ui/build/
+twitter-clone-ui/node_modules/
+twitter-clone-ui/.vercel
+
+# Node.js
+node_modules/
+npm-debug.log
+dist/
+
+# Testing
+twitter-clone/coverage/
+twitter-clone-ui/coverage/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*~
+*.swp
+*.swo
+.tmp
+.temp
+
+# Compiled files
+*.class
+*.war
+*.ear
+*.jar
+*.zip
+*.tar.gz
+*.rar
+twitter-clone-ui/.next
+twitter-clone-ui/.pnp
+twitter-clone-ui/.pnp.js
+
+# Caches
+.cache/
+twitter-clone-ui/.eslintcache
+twitter-clone-ui/.stylelintcache
+twitter-clone-ui/.tsbuildinfo
+.npm 
