@@ -68,6 +68,51 @@ Standard URLs (if port 3000 is available):
 
 **Note**: If port 3000 is already in use, Docker will automatically use the next available port in the range 3000-3010. The actual port will be displayed when you run `npm start` or `npm run info`.
 
+## Stopping and Restarting the Application
+
+### Stopping the Application
+
+To stop all running containers without removing data:
+
+```bash
+npm run stop
+```
+
+This safely shuts down all Docker containers while preserving your data in volumes.
+
+### Restarting the Application
+
+To restart all services (for example, after making code changes):
+
+```bash
+npm run restart
+```
+
+This will restart all containers and display the current access URLs when services are ready.
+
+### Complete Cleanup and Restart
+
+If you need a fresh start (this will delete all data):
+
+```bash
+npm run clean    # Stops containers and removes all volumes (deletes all data)
+npm start        # Starts everything again from scratch
+```
+
+### Targeted Restarts
+
+For development, you may want to restart only specific services:
+
+```bash
+# Restart only the backend
+docker-compose restart backend
+npm run info     # Check the current URLs
+
+# Restart only the frontend
+docker-compose restart frontend
+npm run info     # Check the current URLs
+```
+
 ## Port Detection and Availability
 
 The project now includes robust port conflict handling:
