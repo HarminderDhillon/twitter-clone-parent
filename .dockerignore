@@ -1,0 +1,40 @@
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+.DS_Store
+.cursor/
+
+# Build directories and files
+target/
+!target/*.jar
+build/
+out/
+bin/
+logs/
+
+# Development files
+.env
+*.log
+temp/
+node_modules/
+
+# Testing
+.coverage
+.pytest_cache/
+
+# Git
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# Miscellaneous
+README.md
+LICENSE
+CONTRIBUTING.md
+CHANGELOG.md 
