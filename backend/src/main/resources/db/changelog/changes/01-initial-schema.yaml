@@ -1,0 +1,214 @@
+databaseChangeLog:
+  - changeSet:
+      id: "1"
+      author: liquibase
+      comment: Initial schema creation migrated from Flyway
+      changes:
+        # Users table
+        - createTable:
+            tableName: users
+            remarks: Table storing all registered users in the system
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: email
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password_hash
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: varchar(100)
+              - column:
+                  name: bio
+                  type: text
+              - column:
+                  name: location
+                  type: varchar(100)
+              - column:
+                  name: website
+                  type: varchar(255)
+              - column:
+                  name: profile_image
+                  type: varchar(255)
+              - column:
+                  name: header_image
+                  type: varchar(255)
+              - column:
+                  name: verified
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email_verified
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+
+        # User roles table
+        - createTable:
+            tableName: user_roles
+            remarks: Roles assigned to each user for authorization
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_roles_user
+                    references: users(id)
+                    deleteCascade: true
+              - column:
+                  name: role
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: primary_key_constraint
+                  type: primary key (user_id, role)
+                  constraints:
+                    primaryKey: true
+
+        # Posts table
+        - createTable:
+            tableName: posts
+            remarks: Table storing all posts (tweets) created by users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_posts_user
+                    references: users(id)
+                    deleteCascade: true
+              - column:
+                  name: content
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_reply
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: parent_id
+                  type: uuid
+                  constraints:
+                    foreignKeyName: fk_posts_parent
+                    references: posts(id)
+                    deleteCascade: false
+              - column:
+                  name: is_repost
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: original_post_id
+                  type: uuid
+                  constraints:
+                    foreignKeyName: fk_posts_original
+                    references: posts(id)
+                    deleteCascade: false
+              - column:
+                  name: like_count
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reply_count
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: repost_count
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  defaultValueComputed: now()
+                  constraints:
+                    nullable: false
+
+        # Create remaining tables and indexes following the same pattern
+        # ... more tables will be added in subsequent changesets
+
+  - changeSet:
+      id: "2"
+      author: liquibase
+      comment: Create indexes for performance
+      changes:
+        - createIndex:
+            indexName: idx_posts_user_id
+            tableName: posts
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            indexName: idx_posts_parent_id
+            tableName: posts
+            columns:
+              - column:
+                  name: parent_id
+        - createIndex:
+            indexName: idx_posts_created_at
+            tableName: posts
+            columns:
+              - column:
+                  name: created_at 
