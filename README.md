@@ -26,16 +26,48 @@ git clone https://github.com/HarminderDhillon/twitter-clone-parent.git
 cd twitter-clone-parent
 ```
 
-### 2. Start Required Services
+### 2. Setup Workspace
+
+The simplest way to set up the workspace is to run the setup script:
+
+```bash
+./setup-workspace.sh
+```
+
+This will:
+- Install root-level dependencies
+- Install frontend dependencies
+- Download backend dependencies (if Maven is available)
+- Optionally start required Docker services
+
+Alternatively, you can manually set up the workspace:
+
+```bash
+# Install root dependencies
+npm install
+
+# Install frontend dependencies
+npm install --workspace=frontend
+
+# Install backend dependencies
+cd backend && ./mvnw dependency:go-offline -B && cd ..
+```
+
+### 3. Start Required Services
 
 The application requires PostgreSQL to be running. You have two options:
 
-**Option 1:** Use Docker Compose (recommended)
+**Option 1:** Use npm script (recommended)
+```bash
+npm run docker
+```
+
+**Option 2:** Use Docker Compose directly
 ```bash
 docker-compose up -d postgres redis
 ```
 
-**Option 2:** Use locally installed PostgreSQL
+**Option 3:** Use locally installed PostgreSQL
 ```bash
 # On macOS with Homebrew
 brew services start postgresql
@@ -46,36 +78,27 @@ sudo service postgresql start
 
 Ensure you have a database named `twitterclone` with username `postgres` and password `postgres`.
 
-### 3. Run the Application
+### 4. Run the Application
 
-You can run both the frontend and backend with a single script:
+You can run both the frontend and backend with a single command:
 
 ```bash
-./start-apps.sh
+npm start
 ```
-
-This script will:
-- Check if PostgreSQL is running and prompt to start it if needed
-- Start the Spring Boot backend on port 8081
-- Start the Next.js frontend on port 3000
-- Use tmux to display both applications in a split terminal (if tmux is available)
 
 Or you can run them separately:
 
 **Backend:**
 ```bash
-cd backend
-./mvnw spring-boot:run
+npm run start:backend
 ```
 
 **Frontend:**
 ```bash
-cd frontend
-npm install
-npm run dev
+npm run start:frontend
 ```
 
-### 4. Access the Application
+### 5. Access the Application
 
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8081/api
@@ -209,5 +232,43 @@ If the backend can't connect to PostgreSQL:
 
 2. Start PostgreSQL using Docker if you don't have it installed locally:
    ```bash
-   docker-compose up -d postgres
-   ``` 
+   npm run docker -- postgres
+   ```
+
+## Available Scripts
+
+The project includes several npm scripts to help with development:
+
+- `npm start` - Starts both backend and frontend
+- `npm run build` - Builds both backend and frontend
+- `npm run test` - Runs tests for both backend and frontend
+- `npm run docker` - Starts all Docker services
+- `npm run docker:build` - Builds all Docker images
+- `npm run docker:down` - Stops all Docker services
+- `npm run docker:logs` - Shows logs from all Docker services
+- `npm run lint` - Runs linting on frontend code
+- `npm run clean` - Cleans build artifacts and dependencies
+
+```bash
+npm run docker
+```
+
+```bash
+npm run docker:build
+```
+
+```bash
+npm run docker:down
+```
+
+```bash
+npm run docker:logs
+```
+
+```bash
+npm run lint
+```
+
+```bash
+npm run clean
+``` 
