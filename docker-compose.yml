@@ -31,41 +31,69 @@ services:
       timeout: 5s
       retries: 5
 
-  # Uncomment if you need Elasticsearch
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
-  #   container_name: twitter-clone-elasticsearch
-  #   environment:
-  #     - discovery.type=single-node
-  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-  #     - xpack.security.enabled=false
-  #   ports:
-  #     - "9200:9200"
-  #   volumes:
-  #     - elastic-data:/usr/share/elasticsearch/data
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:9200"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 5
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    container_name: twitter-clone-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
-  # Uncomment if you need RabbitMQ
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   container_name: twitter-clone-rabbitmq
-  #   ports:
-  #     - "5672:5672"
-  #     - "15672:15672"
-  #   volumes:
-  #     - rabbitmq-data:/var/lib/rabbitmq
-  #   healthcheck:
-  #     test: ["CMD", "rabbitmqctl", "status"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 5
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: twitter-clone-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  backend:
+    build: 
+      context: ./twitter-clone
+      dockerfile: Dockerfile
+    container_name: twitter-clone-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/twitterclone
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_REDIS_HOST=redis
+      - SPRING_DATA_ELASTICSEARCH_CLUSTER-NODES=elasticsearch:9200
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - JWT_SECRET=changeThisToASecureKeyInProduction
+      - SPRING_LIQUIBASE_ENABLED=false
+    ports:
+      - "8082:8081"
+    volumes:
+      - backend-uploads:/app/uploads
 
 volumes:
   postgres-data:
   redis-data:
-  # elastic-data:
-  # rabbitmq-data: 
+  elastic-data:
+  rabbitmq-data:
+  backend-uploads: 

@@ -82,6 +82,43 @@ npm run dev
 - Backend API: http://localhost:8081/api
 - API Documentation: http://localhost:8081/api/swagger-ui.html
 
+## Docker Setup
+
+### Run with Docker Compose
+
+The entire application can be run using Docker Compose:
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+```
+
+### Backend Dockerization
+
+The Spring Boot backend has been dockerized. See `twitter-clone/README.docker.md` for detailed instructions.
+
+This setup includes:
+- Multi-stage build for efficient Docker images
+- Proper layering for better cache utilization
+- Environment variable configuration
+- Healthchecks for dependency services
+- Non-root user for improved security
+
+### Available Services
+
+The following services are configured in Docker Compose:
+- PostgreSQL database
+- Redis for caching
+- Elasticsearch for search functionality
+- RabbitMQ for messaging
+- Spring Boot backend API (available at http://localhost:8082/api when running in Docker)
+
 ## Development
 
 ### Backend
