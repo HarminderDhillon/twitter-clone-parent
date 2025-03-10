@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}Fixing Next.js installation...${NC}"
 
 # Navigate to the frontend directory
-cd twitter-clone-ui
+cd frontend
 
 # Clean the installation
 echo -e "${YELLOW}Cleaning node_modules and .next directories...${NC}"
@@ -28,4 +28,4 @@ npm install
 
 echo -e "${GREEN}Next.js installation fixed. Please try running the application again.${NC}"
 echo -e "${YELLOW}You can use the following command to start the frontend:${NC}"
-echo -e "cd twitter-clone-ui && npm run dev" 
+echo -e "cd frontend && npm run dev" 

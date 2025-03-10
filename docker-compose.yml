@@ -64,7 +64,7 @@ services:
 
   backend:
     build: 
-      context: ./twitter-clone
+      context: ./backend
       dockerfile: Dockerfile
     container_name: twitter-clone-backend
     depends_on:
@@ -93,7 +93,7 @@ services:
 
   frontend:
     build:
-      context: ./twitter-clone-ui
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: twitter-clone-frontend
     ports:

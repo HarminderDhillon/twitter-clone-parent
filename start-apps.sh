@@ -61,12 +61,12 @@ if ! command -v tmux &> /dev/null; then
     
     # Start backend
     echo -e "${GREEN}Starting Spring Boot backend...${NC}"
-    cd twitter-clone
+    cd backend
     ./mvnw spring-boot:run &
     
     # Start frontend
     echo -e "${GREEN}Starting Next.js frontend...${NC}"
-    cd ../twitter-clone-ui
+    cd ../frontend
     npm install
     npm run dev &
     
@@ -82,10 +82,10 @@ tmux new-session -d -s $SESSION_NAME
 tmux split-window -h -t $SESSION_NAME
 
 # Start backend in the left pane
-tmux send-keys -t $SESSION_NAME:0.0 "cd twitter-clone && echo -e '${GREEN}Starting Spring Boot backend...${NC}' && ./mvnw spring-boot:run" C-m
+tmux send-keys -t $SESSION_NAME:0.0 "cd backend && echo -e '${GREEN}Starting Spring Boot backend...${NC}' && ./mvnw spring-boot:run" C-m
 
 # Start frontend in the right pane
-tmux send-keys -t $SESSION_NAME:0.1 "cd twitter-clone-ui && echo -e '${GREEN}Starting Next.js frontend...${NC}' && npm install && npm run dev" C-m
+tmux send-keys -t $SESSION_NAME:0.1 "cd frontend && echo -e '${GREEN}Starting Next.js frontend...${NC}' && npm install && npm run dev" C-m
 
 # Attach to the session
 echo -e "${GREEN}Applications starting in tmux session. Backend: http://localhost:8081/api, Frontend: http://localhost:3000${NC}"

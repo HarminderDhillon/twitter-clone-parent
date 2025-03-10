@@ -4,8 +4,8 @@ This is a full-stack Twitter clone application with a Spring Boot backend and Ne
 
 ## Project Structure
 
-- `twitter-clone/` - Spring Boot backend (REST API)
-- `twitter-clone-ui/` - Next.js frontend
+- `backend/` - Spring Boot backend (REST API)
+- `frontend/` - Next.js frontend
 
 ## Prerequisites
 
@@ -24,7 +24,6 @@ This is a full-stack Twitter clone application with a Spring Boot backend and Ne
 ```bash
 git clone https://github.com/HarminderDhillon/twitter-clone-parent.git
 cd twitter-clone-parent
-git submodule update --init --recursive
 ```
 
 ### 2. Start Required Services
@@ -65,13 +64,13 @@ Or you can run them separately:
 
 **Backend:**
 ```bash
-cd twitter-clone
+cd backend
 ./mvnw spring-boot:run
 ```
 
 **Frontend:**
 ```bash
-cd twitter-clone-ui
+cd frontend
 npm install
 npm run dev
 ```
@@ -101,7 +100,7 @@ docker-compose down
 
 ### Backend Dockerization
 
-The Spring Boot backend has been dockerized. See `twitter-clone/README.docker.md` for detailed instructions.
+The Spring Boot backend has been dockerized. See `backend/README.docker.md` for detailed instructions.
 
 This setup includes:
 - Multi-stage build for efficient Docker images
@@ -158,7 +157,7 @@ The application supports multiple environments:
 To run with a specific profile, use:
 
 ```bash
-cd twitter-clone
+cd backend
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
 ```
 
@@ -168,7 +167,7 @@ Database migrations are managed with Liquibase:
 
 ```bash
 # To create a new migration (change set)
-cd twitter-clone
+cd backend
 ./mvnw liquibase:generateChangeLog
 ```
 
@@ -176,11 +175,11 @@ cd twitter-clone
 
 ```bash
 # Run backend tests
-cd twitter-clone
+cd backend
 ./mvnw test
 
 # Run frontend tests
-cd twitter-clone-ui
+cd frontend
 npm test
 ```
 
