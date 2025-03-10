@@ -15,6 +15,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7
@@ -28,6 +29,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
@@ -45,6 +47,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -59,6 +62,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+    restart: unless-stopped
 
   backend:
     build: 
@@ -83,7 +87,10 @@ services:
       - SPRING_DATA_ELASTICSEARCH_CLUSTER-NODES=elasticsearch:9200
       - SPRING_RABBITMQ_HOST=rabbitmq
       - JWT_SECRET=changeThisToASecureKeyInProduction
-      - SPRING_LIQUIBASE_ENABLED=false
+      - SPRING_LIQUIBASE_ENABLED=true
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      - SPRING_JPA_GENERATE_DDL=true
     ports:
       - "8082:8081"
     volumes:
@@ -94,6 +101,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    restart: unless-stopped
 
   frontend:
     build:
@@ -101,7 +109,8 @@ services:
       dockerfile: Dockerfile
     container_name: twitter-clone-frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "3000-3010:3000"
     environment:
@@ -114,6 +123,51 @@ services:
       retries: 5
       start_period: 20s
 
+  # Replaces functionality from show-ports.sh and app-info service
+  status:
+    image: alpine:latest
+    container_name: twitter-clone-status
+    depends_on:
+      - frontend
+      - backend
+    command: >
+      sh -c "
+        apk add --no-cache curl &&
+        sleep 5 &&
+        
+        echo '===== Twitter Clone Application Status =====' &&
+        
+        # Try to find the frontend port (direct approach)
+        FRONTEND_PORT='' &&
+        FRONTEND_STATUS='not running' &&
+        for port in $(seq 3000 3010); do
+          if curl -s -o /dev/null -m 1 -w '' http://localhost:$port 2>/dev/null; then
+            FRONTEND_PORT=$port
+            FRONTEND_STATUS=\"http://localhost:$port\"
+            break
+          fi
+        done &&
+        
+        # Backend is mapped to port 8082
+        if curl -s -o /dev/null -m 1 -w '' http://localhost:8082/api 2>/dev/null; then
+          BACKEND_STATUS='http://localhost:8082/api'
+          API_DOCS_STATUS='http://localhost:8082/api/swagger-ui.html'
+        else
+          BACKEND_STATUS='not running'
+          API_DOCS_STATUS='not running'
+        fi &&
+        
+        echo 'Frontend:         '$FRONTEND_STATUS &&
+        echo 'Backend API:      '$BACKEND_STATUS &&
+        echo 'API Documentation: '$API_DOCS_STATUS &&
+        echo '=============================================' &&
+        echo 'Note: For exact port mappings, run: docker-compose ps'
+      "
+    network_mode: "host"
+    profiles:
+      - status
+
+  # Service for one-time display of application information after startup
   app-info:
     image: alpine:latest
     container_name: twitter-clone-info
@@ -123,22 +177,56 @@ services:
     command: >
       sh -c "
         apk add --no-cache curl &&
-        sleep 5 &&
-        FRONTEND_PORT=3000 &&
+        sleep 10 &&
+        
+        echo '===== Twitter Clone Application Running =====' &&
+        
+        # Try to find the frontend port (direct approach)
+        FRONTEND_PORT='' &&
         for port in $(seq 3000 3010); do
-          if curl -s -o /dev/null -w '' http://localhost:$port; then
+          if curl -s -o /dev/null -m 1 -w '' http://localhost:$port 2>/dev/null; then
             FRONTEND_PORT=$port
             break
           fi
         done &&
-        echo '===== Twitter Clone Application Running =====' &&
-        echo 'Frontend:         http://localhost:'$FRONTEND_PORT &&
+        
+        # If we couldn't find the port, use a default message
+        if [ -z \"$FRONTEND_PORT\" ]; then
+          echo 'Frontend:         http://localhost:3000-3010 (check docker ps for exact port)' 
+        else
+          echo 'Frontend:         http://localhost:'$FRONTEND_PORT
+        fi &&
+        
         echo 'Backend API:      http://localhost:8082/api' &&
         echo 'API Documentation: http://localhost:8082/api/swagger-ui.html' &&
         echo '=============================================' &&
-        echo 'To check services again, run: npm run info'
+        echo 'To check services again, run: docker-compose run --rm status' &&
+        echo 'For exact port mappings, run: docker-compose ps'
       "
     network_mode: "host"
+
+  # Service to fix Next.js if needed (replacing fix-nextjs.sh)
+  fix-nextjs:
+    image: node:18-alpine
+    container_name: twitter-clone-fix-nextjs
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: >
+      sh -c "
+        echo 'Fixing Next.js installation...' &&
+        rm -rf node_modules &&
+        rm -rf .next &&
+        rm -f package-lock.json &&
+        echo 'Updating Next.js to a stable version...' &&
+        sed -i 's/\"next\": \"14.2.0\"/\"next\": \"14.1.0\"/g' package.json &&
+        sed -i 's/\"eslint-config-next\": \"14.2.0\"/\"eslint-config-next\": \"14.1.0\"/g' package.json &&
+        echo 'Reinstalling dependencies...' &&
+        npm install &&
+        echo 'Next.js installation fixed. Please restart the application.'
+      "
+    profiles:
+      - tools
 
 volumes:
   postgres-data:

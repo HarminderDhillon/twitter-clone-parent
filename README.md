@@ -10,7 +10,7 @@ This is a full-stack Twitter clone application with a Spring Boot backend and Ne
 ## Prerequisites
 
 - Docker and Docker Compose
-- npm (to run the setup script and convenience commands)
+- npm (for convenience commands - optional)
 
 No need to install Java, Maven, Node.js, PostgreSQL or other dependencies locally - everything runs in Docker!
 
@@ -23,42 +23,45 @@ git clone https://github.com/HarminderDhillon/twitter-clone-parent.git
 cd twitter-clone-parent
 ```
 
-### 2. Setup Workspace
+### 2. Setup and Start the Application
 
-The simplest way to set up the workspace is to run the setup script:
+The application can be set up and run with simple Docker Compose commands:
 
-```bash
-./setup-workspace.sh
-```
-
-This will:
-- Check for Docker and Docker Compose installation
-- Install minimal npm dependencies for convenience scripts
-- Optionally build the Docker images
-
-### 3. Start the Application
-
-Start all services with a single command:
+#### Using npm (Recommended for convenience)
 
 ```bash
+# Install minimal npm dependencies for convenience scripts
+npm install
+
+# Build and start all services
+npm run setup
 npm start
 ```
 
-This will start all containers and display access information automatically:
-- PostgreSQL database
-- Redis for caching
-- Elasticsearch for search functionality
-- RabbitMQ for messaging
-- Spring Boot backend API
-- Next.js frontend
+#### Using Docker Compose directly
 
-### 4. Access the Application
+```bash
+# Build all Docker images
+docker-compose build
+
+# Start all services
+docker-compose up -d
+
+# Display application information
+docker-compose run --rm app-info
+```
+
+### 3. Access the Application
 
 After starting the application, the access URLs will be automatically displayed on your screen.
 
 You can view this information again anytime with:
 ```bash
 npm run info
+```
+or
+```bash
+docker-compose run --rm status
 ```
 
 Standard URLs (if port 3000 is available):
@@ -77,6 +80,10 @@ To stop all running containers without removing data:
 ```bash
 npm run stop
 ```
+or
+```bash
+docker-compose down
+```
 
 This safely shuts down all Docker containers while preserving your data in volumes.
 
@@ -86,6 +93,11 @@ To restart all services (for example, after making code changes):
 
 ```bash
 npm run restart
+```
+or
+```bash
+docker-compose restart
+docker-compose run --rm app-info
 ```
 
 This will restart all containers and display the current access URLs when services are ready.
@@ -98,6 +110,11 @@ If you need a fresh start (this will delete all data):
 npm run clean    # Stops containers and removes all volumes (deletes all data)
 npm start        # Starts everything again from scratch
 ```
+or
+```bash
+docker-compose down -v    # Stops containers and removes all volumes (deletes all data)
+docker-compose up -d      # Starts everything again from scratch
+```
 
 ### Targeted Restarts
 
@@ -106,19 +123,20 @@ For development, you may want to restart only specific services:
 ```bash
 # Restart only the backend
 docker-compose restart backend
-npm run info     # Check the current URLs
 
 # Restart only the frontend
 docker-compose restart frontend
-npm run info     # Check the current URLs
+
+# Check the current URLs
+npm run info
 ```
 
 ## Port Detection and Availability
 
-The project now includes robust port conflict handling:
+The project includes robust port conflict handling:
 
 1. The frontend container can use any port in the range 3000-3010
-2. The `show-ports.sh` script will automatically detect which port is being used
+2. The status service will automatically detect which port is being used
 3. If port 3000 is in use by another application, Docker will use the next available port
 4. Run `npm run info` at any time to see the current port assignments
 
@@ -138,6 +156,8 @@ The project includes several npm scripts to help with Docker operations:
 - `npm run rebuild` - Rebuilds all Docker images from scratch (no cache)
 - `npm run clean` - Stops all services and removes volumes
 - `npm run status` - Shows the status of all Docker containers
+- `npm run fix-nextjs` - Fixes Next.js installation if there are issues
+- `npm run setup` - Sets up the workspace by building all Docker images
 
 ## Docker Setup
 
@@ -150,7 +170,9 @@ The following services are configured in Docker Compose:
 - RabbitMQ for messaging (ports 5672, 15672)
 - Spring Boot backend API (port 8082)
 - Next.js frontend (port 3000-3010, automatically selected)
-- Info service (displays URL information)
+- Status service (displays URL information)
+- App Info service (one-time display of URL information after startup)
+- Fix Next.js service (used to fix Next.js issues if they arise)
 
 ### Backend Dockerization
 
@@ -183,12 +205,6 @@ Make changes to the code in the `frontend/` directory. The Docker container will
 Make changes to the code in the `backend/` directory, then rebuild and restart the backend service:
 
 ```bash
-npm run build # Builds all Docker images
-npm run restart # Restarts all services
-```
-
-For more targeted approach:
-```bash
 docker-compose build backend
 docker-compose restart backend
 ```
@@ -202,9 +218,13 @@ If containers aren't starting properly:
 ```bash
 # Check container status
 npm run status
+# or
+docker-compose ps
 
 # View detailed logs
 npm run logs
+# or
+docker-compose logs -f
 ```
 
 ### Port Conflicts
@@ -214,9 +234,13 @@ If you're seeing issues with port assignments:
 ```bash
 # Check which ports are being used
 npm run info
+# or
+docker-compose run --rm status
 
 # If the frontend port isn't what you expect, try restarting
 npm run restart
+# or
+docker-compose restart
 ```
 
 ### Database Connection Issues
@@ -226,12 +250,28 @@ If the backend can't connect to PostgreSQL:
 1. Check if PostgreSQL container is running:
    ```bash
    npm run status
+   # or
+   docker-compose ps
    ```
 
 2. Check PostgreSQL logs:
    ```bash
    npm run logs:db
+   # or
+   docker-compose logs -f postgres
    ```
+
+### Next.js Issues
+
+If you encounter issues with the Next.js frontend:
+
+```bash
+# Fix Next.js installation
+npm run fix-nextjs
+
+# Restart the frontend
+docker-compose restart frontend
+```
 
 ### Container Cleanup
 
@@ -240,10 +280,16 @@ If you need a fresh start:
 ```bash
 # Stop all containers and remove volumes
 npm run clean
+# or
+docker-compose down -v
 
 # Rebuild from scratch
 npm run rebuild
+# or
+docker-compose build --no-cache
 
 # Start services again
 npm start
+# or
+docker-compose up -d
 ``` 

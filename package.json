@@ -5,10 +5,10 @@
   "workspaces": ["frontend"],
   "description": "A full-stack Twitter clone with Spring Boot backend and Next.js frontend",
   "scripts": {
-    "start": "docker-compose up -d && docker-compose up app-info",
+    "start": "docker-compose up -d && docker-compose run --rm app-info",
     "stop": "docker-compose down",
-    "restart": "docker-compose restart && docker-compose up app-info",
-    "info": "./show-ports.sh",
+    "restart": "docker-compose restart && docker-compose run --rm app-info",
+    "info": "docker-compose run --rm status",
     "logs": "docker-compose logs -f",
     "logs:backend": "docker-compose logs -f backend",
     "logs:frontend": "docker-compose logs -f frontend",
@@ -16,7 +16,9 @@
     "build": "docker-compose build",
     "rebuild": "docker-compose build --no-cache",
     "clean": "docker-compose down -v",
-    "status": "docker-compose ps"
+    "status": "docker-compose ps",
+    "fix-nextjs": "docker-compose --profile tools run --rm fix-nextjs",
+    "setup": "docker-compose build"
   },
   "author": "Harminder Dhillon",
   "engines": {
