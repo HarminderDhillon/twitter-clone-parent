@@ -6,7 +6,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*', // Proxy API requests to the Spring Boot backend
+        destination: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/:path*', // Use environment variable or fallback
       },
     ];
   },

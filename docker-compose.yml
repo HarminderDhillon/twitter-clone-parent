@@ -91,6 +91,19 @@ services:
     volumes:
       - backend-uploads:/app/uploads
 
+  frontend:
+    build:
+      context: ./twitter-clone-ui
+      dockerfile: Dockerfile
+    container_name: twitter-clone-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8081/api
+    restart: unless-stopped
+
 volumes:
   postgres-data:
   redis-data:

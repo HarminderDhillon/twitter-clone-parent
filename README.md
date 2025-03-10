@@ -110,6 +110,14 @@ This setup includes:
 - Healthchecks for dependency services
 - Non-root user for improved security
 
+### Frontend Dockerization
+
+The Next.js frontend has been dockerized with the following features:
+- Multi-stage build process for minimal image size
+- Production-ready configuration
+- Automatic environment configuration for API communication
+- Seamless integration with the backend service
+
 ### Available Services
 
 The following services are configured in Docker Compose:
@@ -118,6 +126,7 @@ The following services are configured in Docker Compose:
 - Elasticsearch for search functionality
 - RabbitMQ for messaging
 - Spring Boot backend API (available at http://localhost:8082/api when running in Docker)
+- Next.js frontend (available at http://localhost:3000 when running in Docker)
 
 ## Development
 
