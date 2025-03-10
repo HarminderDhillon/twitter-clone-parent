@@ -68,6 +68,15 @@ Standard URLs (if port 3000 is available):
 
 **Note**: If port 3000 is already in use, Docker will automatically use the next available port in the range 3000-3010. The actual port will be displayed when you run `npm start` or `npm run info`.
 
+## Port Detection and Availability
+
+The project now includes robust port conflict handling:
+
+1. The frontend container can use any port in the range 3000-3010
+2. The `show-ports.sh` script will automatically detect which port is being used
+3. If port 3000 is in use by another application, Docker will use the next available port
+4. Run `npm run info` at any time to see the current port assignments
+
 ## Available Scripts
 
 The project includes several npm scripts to help with Docker operations:
@@ -75,7 +84,7 @@ The project includes several npm scripts to help with Docker operations:
 - `npm start` - Starts all Docker services and displays access URLs
 - `npm run stop` - Stops all Docker services
 - `npm run restart` - Restarts all Docker services and displays access URLs
-- `npm run info` - Displays access URLs for running services
+- `npm run info` - Displays access URLs for running services (works even if ports change)
 - `npm run logs` - Shows logs from all Docker services
 - `npm run logs:backend` - Shows only backend logs
 - `npm run logs:frontend` - Shows only frontend logs
@@ -96,6 +105,7 @@ The following services are configured in Docker Compose:
 - RabbitMQ for messaging (ports 5672, 15672)
 - Spring Boot backend API (port 8082)
 - Next.js frontend (port 3000-3010, automatically selected)
+- Info service (displays URL information)
 
 ### Backend Dockerization
 
@@ -115,6 +125,7 @@ The Next.js frontend has been dockerized with the following features:
 - Production-ready configuration
 - Automatic environment configuration for API communication
 - Seamless integration with the backend service
+- Flexible port mapping with conflict resolution
 
 ## Development
 
@@ -149,6 +160,18 @@ npm run status
 
 # View detailed logs
 npm run logs
+```
+
+### Port Conflicts
+
+If you're seeing issues with port assignments:
+
+```bash
+# Check which ports are being used
+npm run info
+
+# If the frontend port isn't what you expect, try restarting
+npm run restart
 ```
 
 ### Database Connection Issues
