@@ -44,7 +44,7 @@ Start all services with a single command:
 npm start
 ```
 
-This will start all containers:
+This will start all containers and display access information automatically:
 - PostgreSQL database
 - Redis for caching
 - Elasticsearch for search functionality
@@ -54,27 +54,28 @@ This will start all containers:
 
 ### 4. Access the Application
 
-After starting the application, the ports will be automatically displayed. 
+After starting the application, the access URLs will be automatically displayed on your screen.
 
-You can also check the ports anytime with:
+You can view this information again anytime with:
 ```bash
-npm run ports
+npm run info
 ```
 
-Standard ports (if available):
+Standard URLs (if port 3000 is available):
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8082/api
 - API Documentation: http://localhost:8082/api/swagger-ui.html
 
-**Note**: If port 3000 is already in use, Docker will automatically use the next available port in the range 3000-3010. The actual port will be displayed when you run `npm start` or `npm run ports`.
+**Note**: If port 3000 is already in use, Docker will automatically use the next available port in the range 3000-3010. The actual port will be displayed when you run `npm start` or `npm run info`.
 
 ## Available Scripts
 
 The project includes several npm scripts to help with Docker operations:
 
 - `npm start` - Starts all Docker services and displays access URLs
-- `npm run stop` - Stops all Docker services (docker-compose down)
-- `npm run restart` - Restarts all Docker services (docker-compose restart)
+- `npm run stop` - Stops all Docker services
+- `npm run restart` - Restarts all Docker services and displays access URLs
+- `npm run info` - Displays access URLs for running services
 - `npm run logs` - Shows logs from all Docker services
 - `npm run logs:backend` - Shows only backend logs
 - `npm run logs:frontend` - Shows only frontend logs
@@ -83,7 +84,6 @@ The project includes several npm scripts to help with Docker operations:
 - `npm run rebuild` - Rebuilds all Docker images from scratch (no cache)
 - `npm run clean` - Stops all services and removes volumes
 - `npm run status` - Shows the status of all Docker containers
-- `npm run ports` - Shows the URLs and ports for all services
 
 ## Docker Setup
 
@@ -95,7 +95,7 @@ The following services are configured in Docker Compose:
 - Elasticsearch for search functionality (port 9200)
 - RabbitMQ for messaging (ports 5672, 15672)
 - Spring Boot backend API (port 8082)
-- Next.js frontend (port 3000)
+- Next.js frontend (port 3000-3010, automatically selected)
 
 ### Backend Dockerization
 
