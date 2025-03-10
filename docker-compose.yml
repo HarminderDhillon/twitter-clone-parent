@@ -126,11 +126,11 @@ services:
         sleep 5 &&
         FRONTEND_PORT=$(docker ps -f name=twitter-clone-frontend --format '{{.Ports}}' | grep -o '0.0.0.0:[0-9]*->3000' | cut -d ':' -f2 | cut -d '-' -f1) &&
         if [ -z \"$FRONTEND_PORT\" ]; then FRONTEND_PORT=3000; fi &&
-        echo '\033[0;34m===== Twitter Clone Application Running =====\033[0m' &&
-        echo '\033[0;32mFrontend:\033[0m http://localhost:'$FRONTEND_PORT &&
-        echo '\033[0;32mBackend API:\033[0m http://localhost:8082/api' &&
-        echo '\033[0;32mAPI Documentation:\033[0m http://localhost:8082/api/swagger-ui.html' &&
-        echo '\033[0;34m=============================================\033[0m' &&
+        echo '===== Twitter Clone Application Running =====' &&
+        echo 'Frontend:         http://localhost:'$FRONTEND_PORT &&
+        echo 'Backend API:      http://localhost:8082/api' &&
+        echo 'API Documentation: http://localhost:8082/api/swagger-ui.html' &&
+        echo '=============================================' &&
         echo 'To check services again, run: npm run info'
       "
     volumes:
