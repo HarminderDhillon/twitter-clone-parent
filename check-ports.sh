@@ -15,36 +15,64 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-# Check if frontend container is running
-if ! docker ps | grep -q twitter-clone-frontend; then
-    echo -e "${YELLOW}Frontend container is not running. Starting containers...${NC}"
-    docker-compose up -d
-    
-    # Wait for containers to start - increase timeout and add better feedback
-    echo -e "${YELLOW}Waiting for containers to start and ports to be assigned...${NC}"
-    MAX_ATTEMPTS=15
-    ATTEMPT=0
-    
-    while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-        ATTEMPT=$((ATTEMPT+1))
-        echo -n "."
+# Check if frontend container is running and handling port conflicts
+RETRY_COUNT=0
+MAX_RETRIES=3
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    # Check if frontend container is running
+    if docker ps | grep -q twitter-clone-frontend; then
+        # Container is running - great!
+        break
+    else
+        # Container is not running
+        if [ $RETRY_COUNT -eq 0 ]; then
+            echo -e "${YELLOW}Frontend container is not running. Starting containers...${NC}"
+            docker-compose up -d
+        else
+            echo -e "${YELLOW}Retrying with alternate port (attempt $RETRY_COUNT)...${NC}"
+            # Stop any failed frontend container
+            docker-compose stop frontend
+            docker-compose rm -f frontend
+            # Try again, Docker should pick the next available port
+            docker-compose up -d frontend
+        fi
         
-        # Check if frontend container is running
-        if docker ps | grep -q twitter-clone-frontend; then
-            # Give it a moment for port assignment
+        # Wait for containers to start - increase timeout and add better feedback
+        echo -e "${YELLOW}Waiting for containers to start and ports to be assigned...${NC}"
+        MAX_ATTEMPTS=10
+        ATTEMPT=0
+        
+        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT+1))
+            echo -n "."
+            
+            # Check if frontend container is running
+            if docker ps | grep -q twitter-clone-frontend; then
+                # Give it a moment for port assignment
+                sleep 2
+                echo -e "\n${GREEN}Containers started successfully!${NC}"
+                RETRY_COUNT=$MAX_RETRIES  # Force exit from outer loop
+                break
+            fi
+            
+            if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+                echo -e "\n${YELLOW}Container startup taking longer than expected...${NC}"
+                RETRY_COUNT=$((RETRY_COUNT+1))
+                break
+            fi
+            
             sleep 2
-            echo -e "\n${GREEN}Containers started successfully!${NC}"
-            break
-        fi
-        
-        if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-            echo -e "\n${RED}Failed to start containers after multiple attempts.${NC}"
-            echo -e "${YELLOW}Check for errors with:${NC} docker-compose logs"
-            exit 1
-        fi
-        
-        sleep 2
-    done
+        done
+    fi
+done
+
+# Final check - if frontend container still not running after all retries
+if ! docker ps | grep -q twitter-clone-frontend; then
+    echo -e "\n${RED}Failed to start containers after multiple attempts.${NC}"
+    echo -e "${YELLOW}Port 3000 may be in use. Check what's using this port:${NC} lsof -i :3000"
+    echo -e "${YELLOW}For detailed logs:${NC} docker-compose logs frontend"
+    exit 1
 fi
 
 echo -e "${BLUE}Detecting assigned ports...${NC}"
