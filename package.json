@@ -5,7 +5,7 @@
   "workspaces": ["frontend"],
   "description": "A full-stack Twitter clone with Spring Boot backend and Next.js frontend",
   "scripts": {
-    "start": "docker-compose up -d && ./check-ports.sh",
+    "start": "docker-compose up -d && sleep 5 && ./check-ports.sh",
     "stop": "docker-compose down",
     "restart": "docker-compose restart",
     "ports": "./check-ports.sh",
