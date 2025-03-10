@@ -22,8 +22,9 @@ This is a full-stack Twitter clone application with a Spring Boot backend and Ne
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd twitter-clone-application
+git clone https://github.com/HarminderDhillon/twitter-clone-parent.git
+cd twitter-clone-parent
+git submodule update --init --recursive
 ```
 
 ### 2. Start Required Services
