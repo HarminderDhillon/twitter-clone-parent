@@ -3,9 +3,13 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   async rewrites() {
-    // We're not actually rewriting anything because 
-    // the Nginx proxy already handles the routing
-    return [];
+    return [
+      // Forward requests to the backend via Nginx
+      {
+        source: '/backend-api/:path*',
+        destination: '/api/:path*'
+      }
+    ];
   },
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { loginUser } from '@/services/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -13,6 +13,12 @@ export default function Login() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // This will help us debug the component's lifecycle
+  useEffect(() => {
+    console.log('Login component mounted');
+    return () => console.log('Login component unmounted');
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,16 +32,45 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
+    console.log(`Submitting login form for user: ${formData.username}`);
 
     try {
       const response = await loginUser(formData.username, formData.password);
-      if (response.data && response.data.token) {
+      console.log('Login response from API:', response);
+      
+      // Check for token in different possible response formats
+      if (response && response.status === 'success' && response.data && response.data.token) {
+        // Format from our backend
         localStorage.setItem('authToken', response.data.token);
+        console.log('Login successful, redirecting to home');
         router.push('/');
+        return;
+      } 
+      
+      if (response && response.data && response.data.token) {
+        // Alternative format where token is directly in data
+        localStorage.setItem('authToken', response.data.token);
+        console.log('Login successful (alt format), redirecting to home');
+        router.push('/');
+        return;
+      } 
+      
+      if (response && response.token) {
+        // Simple format with token at root level
+        localStorage.setItem('authToken', response.token);
+        console.log('Login successful (simple format), redirecting to home');
+        router.push('/');
+        return;
       }
+      
+      // If we get here, we didn't find a token in the response
+      console.error('Unexpected response format:', response);
+      setError('Login succeeded but no token was found in the response. Please try again or contact support.');
     } catch (err: any) {
-      if (err.response && err.response.data) {
-        setError(err.response.data.message || 'Login failed');
+      console.error('Login error caught in component:', err);
+      if (err.message) {
+        setError(err.message);
       } else {
         setError('Failed to login. Please try again.');
       }

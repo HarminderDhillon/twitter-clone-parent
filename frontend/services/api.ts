@@ -40,19 +40,46 @@ api.interceptors.response.use(
 
 // Auth APIs
 export const loginUser = (username: string, password: string) => {
+  console.log(`Attempting to login user: ${username}`);
+  // Keep this as a Next.js API route
   return fetch('/api/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ username, password }),
-  }).then(response => {
-    if (!response.ok) {
-      return response.json().then(data => {
-        throw new Error(data.message || `Error: ${response.status}`);
-      });
+    // Prevent caching of authentication requests
+    cache: 'no-store',
+  }).then(async response => {
+    console.log(`Login response status: ${response.status}`);
+    
+    // Get the response body as text first for debugging
+    const responseText = await response.text();
+    console.log(`Login response body: ${responseText.substring(0, 200)}${responseText.length > 200 ? '...' : ''}`);
+    
+    // Parse the JSON (if it's valid JSON)
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse response as JSON:', e);
+      throw new Error(`Invalid response format from server: ${responseText.substring(0, 100)}`);
     }
-    return response.json();
+    
+    // Handle error responses
+    if (!response.ok) {
+      const errorMessage = data && data.message 
+        ? data.message 
+        : (data && data.error ? data.error : `Error: ${response.status}`);
+      console.error('Login error:', errorMessage, data);
+      throw new Error(errorMessage);
+    }
+    
+    // Return the parsed data
+    return data;
+  }).catch(error => {
+    console.error('Login request failed:', error);
+    throw error;
   });
 };
 

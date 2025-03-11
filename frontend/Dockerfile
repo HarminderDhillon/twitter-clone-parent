@@ -21,6 +21,9 @@ FROM node:18-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+# Set environment variables for runtime
+ENV NEXT_PUBLIC_API_URL=/api
+ENV BACKEND_URL=http://backend:8081
 
 # Copy necessary files from build stage
 COPY --from=builder /app/next.config.js ./
