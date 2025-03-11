@@ -189,6 +189,18 @@ To add a new migration:
 
 ## Recent Updates
 
+### Authentication System Enhancements (March 2025)
+
+The authentication system has been significantly improved with the addition of a dedicated AuthController that handles login requests and generates JWT tokens. Key improvements include:
+
+1. **New AuthController**: A dedicated controller for authentication operations, including login, logout, and token refresh.
+   
+2. **JWT-Based Authentication**: The system now uses JWT tokens for authentication, providing a stateless and secure way to handle user sessions.
+   
+3. **Login Endpoint**: A new endpoint `/api/auth/login` has been added that validates user credentials and returns a token.
+
+4. **Improved Security**: Password hashing and validation have been enhanced to follow modern security practices.
+
 ### API Endpoint Improvements (March 2025)
 
 We've made significant improvements to the API endpoints, focusing especially on the user management functionality:
@@ -209,6 +221,7 @@ All API endpoints now have consistent behavior and properly follow RESTful princ
 
 All endpoints have been tested and are working correctly:
 
+- ✅ POST `/api/auth/login` - User authentication
 - ✅ GET `/api/users` - Get all users
 - ✅ GET `/api/users/{idOrUsername}` - Get user by ID or username
 - ✅ PUT `/api/users/{idOrUsername}` - Update user

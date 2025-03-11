@@ -82,6 +82,27 @@ yarn start
 This frontend application communicates with the Spring Boot backend API running at `http://localhost:8080/api`. 
 API requests are proxied through Next.js to avoid CORS issues in development.
 
+### API Routing
+
+The application uses a combination of Next.js API routes and direct backend calls:
+
+- **Next.js API Routes**: Used for authentication (/api/login, /api/register) and other frontend-specific functionality. These routes are handled by the Next.js server running on the frontend.
+- **Backend API Calls**: Direct calls to the backend for data operations like fetching posts, user profiles, etc.
+
+When running in Docker with Nginx as a reverse proxy, the routing is managed as follows:
+
+1. Requests to `/api/login` and `/api/test` are routed to the Next.js server
+2. All other `/api/` requests are forwarded to the backend Spring Boot application
+
+This setup allows us to handle authentication in the frontend while delegating data operations to the backend.
+
+## Development Tools
+
+The application includes several testing and debugging tools:
+
+- **API Test Page**: Available at `/test-api`, this page allows testing the API routes directly from the browser
+- **Debug Mode**: Set `DEBUG=true` in your `.env.local` file to enable additional logging
+
 ## Learn More
 
 To learn more about the technologies used in this project:

@@ -6,6 +6,33 @@ This is a full-stack Twitter clone application with a Spring Boot backend and Ne
 
 - `backend/` - Spring Boot backend (REST API)
 - `frontend/` - Next.js frontend
+- `nginx/` - Nginx reverse proxy configuration
+
+## Architecture
+
+The application uses a microservices architecture with the following components:
+
+1. **Frontend**: A Next.js application that provides the user interface
+2. **Backend**: A Spring Boot application that provides the REST API
+3. **Nginx**: A reverse proxy that routes requests between the frontend and backend
+4. **PostgreSQL**: A database for persistent storage
+5. **Redis**: A cache for temporary data storage
+6. **Elasticsearch**: A search engine for efficient data retrieval
+7. **RabbitMQ**: A message broker for asynchronous communication
+
+### API Routing
+
+The application uses Nginx as a reverse proxy to route API requests:
+
+- All requests to `/api/*` are routed to the backend (Spring Boot) service
+- Requests to Next.js API routes (like `/api/login` and `/api/test`) are routed to the frontend service
+- The frontend uses these API routes to communicate with the backend securely
+
+This architecture provides several benefits:
+- Simplified URL management (no need to specify ports)
+- Improved security through a single entry point
+- Better scalability for future enhancements
+- Enhanced development experience
 
 ## Prerequisites
 
