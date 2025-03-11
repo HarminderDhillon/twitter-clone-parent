@@ -9,8 +9,9 @@ RUN npm ci
 # Copy application code
 COPY . .
 
-# Set the correct API URL for production
-RUN echo "NEXT_PUBLIC_API_URL=http://backend:8081/api" > .env.production
+# Set the correct API URL for production - using internal Docker network name
+RUN echo "NEXT_PUBLIC_API_URL=/api" > .env.production
+RUN echo "BACKEND_URL=http://backend:8081" >> .env.production
 
 # Build the Next.js application
 RUN npm run build

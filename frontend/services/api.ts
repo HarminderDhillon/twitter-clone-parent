@@ -40,11 +40,47 @@ api.interceptors.response.use(
 
 // Auth APIs
 export const loginUser = (username: string, password: string) => {
-  return api.post('/auth/login', { username, password });
+  return fetch('/api/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+  }).then(response => {
+    if (!response.ok) {
+      return response.json().then(data => {
+        throw new Error(data.message || `Error: ${response.status}`);
+      });
+    }
+    return response.json();
+  });
 };
 
-export const registerUser = (userData: any) => {
-  return api.post('/auth/register', userData);
+export const registerUser = async (userData: any) => {
+  try {
+    console.log('Registering user with data:', userData);
+    const response = await fetch('/api/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      // Handle non-2xx responses
+      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+      console.error('Registration error response:', errorData);
+      throw new Error(errorData.message || `Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Registration success:', data);
+    return { data };
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
 };
 
 // User APIs

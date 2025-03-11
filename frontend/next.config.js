@@ -3,12 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/:path*', // Use environment variable or fallback
-      },
-    ];
+    // We're not actually rewriting anything because 
+    // the Nginx proxy already handles the routing
+    return [];
   },
 };
 

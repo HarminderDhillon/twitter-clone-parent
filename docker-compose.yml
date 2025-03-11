@@ -91,6 +91,9 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
       - SPRING_JPA_GENERATE_DDL=true
+      - LOGGING_LEVEL_ROOT=INFO
+      - LOGGING_LEVEL_COM_DHILLON_TWITTERCLONE=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB=DEBUG
     ports:
       - "8082:8081"
     volumes:
@@ -114,7 +117,7 @@ services:
     ports:
       - "3000-3010:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:8081/api
+      - NEXT_PUBLIC_API_URL=/api
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:3000 || exit 0"]
@@ -130,6 +133,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - nginx
     command: >
       sh -c "
         apk add --no-cache curl &&
@@ -157,6 +161,14 @@ services:
           API_DOCS_STATUS='not running'
         fi &&
         
+        # Check Nginx proxy (primary access point)
+        if curl -s -o /dev/null -m 1 -w '' http://localhost:80 2>/dev/null; then
+          NGINX_STATUS='http://localhost:80 (Main access point)'
+        else
+          NGINX_STATUS='not running'
+        fi &&
+        
+        echo 'Nginx Proxy:     '$NGINX_STATUS &&
         echo 'Frontend:         '$FRONTEND_STATUS &&
         echo 'Backend API:      '$BACKEND_STATUS &&
         echo 'API Documentation: '$API_DOCS_STATUS &&
@@ -174,6 +186,7 @@ services:
     depends_on:
       - frontend
       - backend
+      - nginx
     command: >
       sh -c "
         apk add --no-cache curl &&
@@ -197,6 +210,7 @@ services:
           echo 'Frontend:         http://localhost:'$FRONTEND_PORT
         fi &&
         
+        echo 'Main Application: http://localhost:80 (Nginx proxy)' &&
         echo 'Backend API:      http://localhost:8082/api' &&
         echo 'API Documentation: http://localhost:8082/api/swagger-ui.html' &&
         echo '=============================================' &&
@@ -227,6 +241,19 @@ services:
       "
     profiles:
       - tools
+
+  # Add a new Nginx reverse proxy service to handle API requests
+  nginx:
+    image: nginx:alpine
+    container_name: twitter-clone-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
 
 volumes:
   postgres-data:
