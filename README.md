@@ -215,6 +215,7 @@ The project includes several npm scripts to help with Docker operations:
 
 The following services are configured in Docker Compose:
 - PostgreSQL database (port 5432)
+- pgAdmin for database management (port 5050)
 - Redis for caching (port 6379)
 - Elasticsearch for search functionality (port 9200)
 - RabbitMQ for messaging (ports 5672, 15672)
@@ -342,4 +343,39 @@ docker-compose build --no-cache
 npm start
 # or
 docker-compose up -d
-``` 
+```
+
+## Database Management
+
+### Accessing PostgreSQL with pgAdmin
+
+The application includes pgAdmin, a web-based PostgreSQL administration tool. To access your database:
+
+1. Start the application using docker-compose:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. Open your browser and navigate to:
+   ```
+   http://localhost:5050
+   ```
+
+3. Login with these credentials:
+   - Email: `admin@example.com`
+   - Password: `admin`
+
+4. After logging in, you'll need to add a new server connection:
+   - Right-click on "Servers" in the left panel and select "Create" > "Server..."
+   - In the "General" tab, give your connection a name (e.g., "Twitter Clone DB")
+   - In the "Connection" tab, enter:
+     - Host: `postgres` (this is the Docker service name)
+     - Port: `5432`
+     - Maintenance database: `twitterclone`
+     - Username: `postgres`
+     - Password: `postgres`
+   - Click "Save"
+
+5. You can now browse your database structure, run queries, and manage your data through the pgAdmin interface.
+
+For security in production environments, consider changing the default pgAdmin and PostgreSQL credentials. 
