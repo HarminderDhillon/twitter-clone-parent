@@ -201,6 +201,29 @@ The authentication system has been significantly improved with the addition of a
 
 4. **Improved Security**: Password hashing and validation have been enhanced to follow modern security practices.
 
+### Frontend Integration
+
+The backend is designed to work with the Next.js frontend through an architecture that uses API proxying:
+
+1. **User Registration**:
+   - Receives user registration requests at `/api/users`
+   - Validates username and email uniqueness
+   - Encrypts passwords before storage
+   - Returns appropriate success or error responses
+
+2. **User Authentication**:
+   - Handles login requests at `/api/auth/login`
+   - Validates credentials against the database
+   - Generates and returns JWT tokens for authenticated users
+   - Manages token expiration and refresh
+
+3. **API Security**:
+   - All protected endpoints require valid JWT tokens
+   - Token validation is handled by Spring Security filters
+   - Role-based access control for sensitive operations
+
+This design allows for a clean separation between the frontend and backend, with the frontend using Next.js API routes as proxies to communicate with the backend services.
+
 ### API Endpoint Improvements (March 2025)
 
 We've made significant improvements to the API endpoints, focusing especially on the user management functionality:

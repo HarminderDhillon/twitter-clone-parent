@@ -25,7 +25,7 @@ The application uses a microservices architecture with the following components:
 The application uses Nginx as a reverse proxy to route API requests:
 
 - All requests to `/api/*` are routed to the backend (Spring Boot) service
-- Requests to Next.js API routes (like `/api/login` and `/api/test`) are routed to the frontend service
+- Requests to Next.js API routes (like `/api/login` and `/api/register`) are routed to the frontend service
 - The frontend uses these API routes to communicate with the backend securely
 
 This architecture provides several benefits:
@@ -33,6 +33,29 @@ This architecture provides several benefits:
 - Improved security through a single entry point
 - Better scalability for future enhancements
 - Enhanced development experience
+
+### Authentication Architecture
+
+The application implements a modern authentication system with these components:
+
+1. **Frontend Authentication Flow**:
+   - User signup and login forms in the Next.js frontend
+   - Next.js API routes (`/api/register` and `/api/login`) that act as proxies
+   - These routes forward requests to the appropriate backend endpoints
+   - Error handling and response processing at the frontend level
+
+2. **Backend Authentication Services**:
+   - Spring Security with JWT token authentication
+   - Dedicated AuthController for handling login requests
+   - UserController for user registration and management
+   - Password encryption and secure token generation
+
+3. **Nginx Integration**:
+   - Routes authentication requests to the appropriate service
+   - Ensures Next.js API routes are handled by the frontend
+   - Routes other API requests to the backend
+
+This multi-layer architecture provides secure, reliable user authentication while maintaining a clean separation of concerns between frontend and backend components.
 
 ## Prerequisites
 
